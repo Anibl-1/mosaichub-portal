@@ -83,8 +83,6 @@
 
 ![AI HTML 页面示例 1](docs/screenshots/ai-html-page-demo-1.jpg)
 
-![AI HTML 页面示例 2](docs/screenshots/ai-html-page-demo-2.jpg)
-
 > AI 可根据业务描述自动生成专题活动页、会议宣传页、公告展示页等 HTML 内容。系统通过 `SafeHtml` 沙箱 iframe 渲染，既能保证展示效果，又能隔离脚本风险，适合快速搭建营销页、培训通知、活动报名页和内部专题页。
 
 ---
