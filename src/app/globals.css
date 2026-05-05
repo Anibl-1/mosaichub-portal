@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --theme-primary-rgb: 26 58 107;
+  --theme-secondary-rgb: 197 160 40;
+  --theme-dark-rgb: 13 31 60;
+  --theme-accent-rgb: 37 99 235;
+  --theme-gold-rgb: 212 165 48;
+  --theme-red-rgb: 196 22 28;
+  --theme-red-dark-rgb: 160 18 24;
+  --theme-section-bg-rgb: 58 58 58;
+  --theme-header-bg-rgb: 44 44 44;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-100 text-gray-800 font-sans transition-colors duration-200;
+  }
+  html.dark body {
+    @apply bg-gray-900 text-gray-200;
+  }
+  ::selection {
+    @apply bg-bank-red/20 text-bank-red;
+  }
+  html.dark ::selection {
+    @apply bg-bank-red/30 text-red-300;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-bank-primary text-white px-6 py-2 rounded-lg hover:bg-bank-dark transition-all duration-200 font-medium shadow-sm hover:shadow-md;
+  }
+  .btn-gold {
+    @apply bg-bank-gold text-white px-6 py-2 rounded-lg hover:bg-yellow-600 transition-all duration-200 font-medium shadow-sm;
+  }
+  .btn-red {
+    @apply bg-bank-red text-white px-6 py-2 rounded-lg hover:bg-bank-redDark transition-all duration-200 font-medium shadow-sm hover:shadow-md;
+  }
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200/80 overflow-hidden transition-colors duration-200;
+  }
+  html.dark .card {
+    @apply bg-gray-800 border-gray-700;
+  }
+  .section-title {
+    @apply text-base font-bold text-white;
+  }
+  .section-header {
+    @apply bg-bank-primary text-white px-4 py-2.5 flex items-center justify-between;
+  }
+  .section-header-red {
+    @apply bg-bank-red text-white px-4 py-2.5 flex items-center justify-between;
+  }
+  .section-tab {
+    @apply px-3 py-1 text-sm cursor-pointer transition-colors;
+  }
+  .section-tab-active {
+    @apply text-white font-bold;
+  }
+  .section-tab-inactive {
+    @apply text-gray-300 hover:text-white;
+  }
+  .news-item {
+    @apply flex items-start gap-2 py-2.5 border-b border-gray-100 last:border-0;
+  }
+  html.dark .news-item {
+    @apply border-gray-700;
+  }
+  .news-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-bank-red mt-2 flex-shrink-0;
+  }
+  .news-link {
+    @apply text-sm text-gray-700 hover:text-bank-red transition-colors leading-snug line-clamp-1;
+  }
+  html.dark .news-link {
+    @apply text-gray-300;
+  }
+  .news-date {
+    @apply text-xs text-gray-400 whitespace-nowrap ml-auto flex-shrink-0;
+  }
+  .photo-card-img {
+    @apply w-full h-28 bg-gray-200 object-cover transition-transform duration-300;
+  }
+  .photo-card-title {
+    @apply text-xs text-gray-600 mt-1.5 line-clamp-1 transition-colors;
+  }
+  html.dark .photo-card-title {
+    @apply text-gray-400;
+  }
+
+  /* Form elements dark mode */
+  html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  html.dark textarea,
+  html.dark select {
+    @apply bg-gray-700/50 border-gray-600 text-gray-200 placeholder-gray-400;
+  }
+
+  /* Dropdown animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Toast notification animation */
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scrollbar */
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { @apply bg-transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded-full; }
+  html.dark .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-gray-600; }
+
+  /* Prose dark mode */
+  html.dark .prose { @apply text-gray-300; }
+  html.dark .prose h1, html.dark .prose h2, html.dark .prose h3, html.dark .prose h4 { @apply text-gray-100; }
+  html.dark .prose a { @apply text-blue-400; }
+  html.dark .prose strong { @apply text-gray-100; }
+  html.dark .prose code { @apply text-gray-200 bg-gray-700; }
+}
