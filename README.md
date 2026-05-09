@@ -1,8 +1,10 @@
 <div align="center">
 
-# 🏢 MosaicHub Portal
+# 🏢 MosaicHub Portal｜企业门户系统
 
 **A modern, modular enterprise portal and AI-powered CMS built with Next.js 14, React, MySQL and Prisma.**
+
+**一套基于 Next.js 14 + MySQL + Prisma 的现代化企业门户、信息发布与 AI CMS 系统。**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
@@ -11,12 +13,32 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)](https://prisma.io/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://mysql.com/)
+[![i18n](https://img.shields.io/badge/i18n-中文%20%2F%20English-green)](#中文快速了解)
 
-**English** | [简体中文](README.zh-CN.md)
+**English + 中文简介** | [完整中文文档](README.zh-CN.md)
 
 MosaicHub Portal helps teams build configurable company portals, internal news systems, public information platforms and AI-assisted content websites with a complete admin dashboard.
 
+中文用户可直接阅读本页的中文简介与快速说明；如需完整中文安装部署、功能介绍和二次开发说明，请查看 [README.zh-CN.md](README.zh-CN.md)。
+
 </div>
+
+---
+
+## 中文快速了解
+
+MosaicHub Portal 是一套可私有化部署、可二次开发、可灵活配置的门户系统，适合企业官网、政企信息公开平台、医院/学校/园区内部门户、行业资讯站、内部知识库和 AI 辅助内容平台。
+
+| 模块 | 中文说明 |
+|------|----------|
+| **模块化首页** | 轮播图、快捷入口、头条新闻、分类文章、图文推荐、自定义 HTML 模块均可后台配置 |
+| **内容管理** | 支持文章发布、封面图、摘要、分类、置顶、评论、敏感词过滤和全文搜索 |
+| **管理后台** | 文章、评论、用户、导航菜单、站点设置、主题配色、数据统计一站式管理 |
+| **AI 能力** | 支持 AI 写作、内容润色、摘要生成、首页布局设计、HTML 页面生成和多模型接入 |
+| **中英文切换** | 前台核心界面支持中文 / English 切换，并保护文章标题、正文、评论等业务数据不被误翻译 |
+| **定制开发** | 支持门户定制、后台扩展、页面美化、AI 接入、私有部署、长期维护 |
+
+> 如果你需要中文完整说明，请查看：[README.zh-CN.md](README.zh-CN.md)
 
 ---
 
@@ -26,6 +48,7 @@ MosaicHub Portal helps teams build configurable company portals, internal news s
 - **Powerful admin dashboard**: manage posts, comments, users, navigation menus, site settings and analytics in one place.
 - **AI-ready CMS**: AI assistant, AI homepage layout designer, AI writing helper and custom HTML page generation.
 - **Flexible branding**: configure site name, logo text, footer, service hotline, ICP record and theme colors without code changes.
+- **Bilingual UI**: built-in Chinese / English language switching for core frontend pages and shared components.
 - **Enterprise access control**: `SUPER_ADMIN`, `ADMIN` and `USER` roles with module-level permissions.
 - **Production-oriented security**: JWT authentication, password hashing, encrypted AI keys, upload validation and HTML sandbox rendering.
 
@@ -148,6 +171,15 @@ AI can generate custom HTML pages for events, training notices, landing pages, c
 | **Dark mode** | Class-based dark mode with local preference |
 | **CSS variables** | Dynamic theme injection integrated with TailwindCSS |
 
+### Bilingual UI / 中文支持
+
+| Feature | Description |
+|---------|-------------|
+| **Chinese / English switch** | Header language switcher with persistent preference |
+| **UI text translation** | Core frontend pages, shared components and common dynamic prompts support bilingual display |
+| **Business data protection** | Post titles, post content, comments, category names and user data are marked to avoid unwanted auto-translation |
+| **中文文档** | Default README includes Chinese highlights, and [README.zh-CN.md](README.zh-CN.md) provides full Chinese documentation |
+
 ### Role-based Access Control
 
 | Role | Permissions |
@@ -196,7 +228,7 @@ AI can generate custom HTML pages for events, training notices, landing pages, c
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/kou-xibin/mosaichub-portal.git
+git clone https://github.com/Anibl-1/mosaichub-portal.git
 cd mosaichub-portal
 ```
 
@@ -282,6 +314,7 @@ mosaichub-portal/
 │   ├── components/
 │   │   ├── Header.tsx
 │   │   ├── Footer.tsx
+│   │   ├── LanguageProvider.tsx
 │   │   ├── ThemeProvider.tsx
 │   │   ├── FloatingSidebar.tsx
 │   │   ├── SafeHtml.tsx
@@ -290,6 +323,7 @@ mosaichub-portal/
 │       ├── prisma.ts
 │       ├── auth.ts
 │       ├── crypto.ts
+│       ├── i18n.ts
 │       └── useSiteSettings.ts
 ├── .env.example
 ├── next.config.js
@@ -360,6 +394,8 @@ DeepSeek CMS, Tailwind admin panel, modular homepage builder
 
 Need customization, private deployment, UI redesign, feature extension or AI integration?
 
+中文服务：支持企业门户、政企门户、医院/学校/园区门户、行业资讯站、内部知识库等场景的二次开发、私有化部署、UI 美化和 AI 能力接入。
+
 <div align="center">
 
 ### Contact
@@ -391,7 +427,7 @@ Need customization, private deployment, UI redesign, feature extension or AI int
 **kou-n**
 
 - **Email**: `837513034@qq.com`
-- **GitHub**: [kou-xibin](https://github.com/kou-xibin)
+- **GitHub**: [Anibl-1/mosaichub-portal](https://github.com/Anibl-1/mosaichub-portal)
 - **Gitee**: [kou-xibin/mosaichub-portal](https://gitee.com/kou-xibin/mosaichub-portal)
 
 ---

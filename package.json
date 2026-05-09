@@ -1,7 +1,7 @@
 {
   "name": "mosaichub-portal",
   "version": "1.0.0",
-  "description": "A modern Next.js enterprise portal and AI-powered CMS with admin dashboard, modular homepage builder, Prisma and MySQL.",
+  "description": "A modern bilingual Next.js enterprise portal and AI-powered CMS with admin dashboard, modular homepage builder, Prisma and MySQL.",
   "private": false,
   "license": "Apache-2.0",
   "author": "kou-n <837513034@qq.com>",
@@ -16,17 +16,19 @@
     "admin-dashboard",
     "enterprise-portal",
     "ai-assistant",
+    "i18n",
+    "bilingual",
     "deepseek",
     "modular-homepage"
   ],
-  "homepage": "https://github.com/kou-xibin/mosaichub-portal#readme",
+  "homepage": "https://github.com/Anibl-1/mosaichub-portal#readme",
   "bugs": {
-    "url": "https://github.com/kou-xibin/mosaichub-portal/issues",
+    "url": "https://github.com/Anibl-1/mosaichub-portal/issues",
     "email": "837513034@qq.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kou-xibin/mosaichub-portal.git"
+    "url": "https://github.com/Anibl-1/mosaichub-portal.git"
   },
   "scripts": {
     "dev": "next dev -p 9055",

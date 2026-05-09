@@ -13,7 +13,7 @@
 
 [English](README.md) | **简体中文**
 
-首页布局、导航菜单、主题配色、侧栏弹窗均可在管理后台灵活配置，内置 AI 智能助手辅助内容创作与页面设计。
+首页布局、导航菜单、主题配色、侧栏弹窗均可在管理后台灵活配置，内置 AI 智能助手辅助内容创作与页面设计，并支持中文 / English 界面切换。
 
 </div>
 
@@ -114,6 +114,14 @@
 | **敏感词过滤** | 评论提交时自动检查敏感词，后台可自定义词库 |
 | **全文搜索** | 按标题关键词搜索文章，支持分页展示 |
 
+### 🌐 中英文切换
+| 功能 | 说明 |
+|------|------|
+| **语言切换按钮** | Header 内置中文 / English 切换入口 |
+| **语言偏好保存** | 用户选择会保存到浏览器本地，下次访问自动恢复 |
+| **核心界面翻译** | 首页、分类、搜索、文章详情、登录注册、个人中心和公共组件支持双语 |
+| **业务数据保护** | 文章标题、正文、评论、栏目名、用户资料等数据库内容保持原文，不会被误翻译 |
+
 ### 🧩 模块化首页
 | 模块类型 | 说明 |
 |----------|------|
@@ -179,7 +187,7 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/kou-xibin/mosaichub-portal.git
+git clone https://github.com/Anibl-1/mosaichub-portal.git
 cd mosaichub-portal
 ```
 
@@ -288,6 +296,7 @@ mosaichub-portal/
 │   ├── components/
 │   │   ├── Header.tsx         # 顶部导航（搜索/主题/用户菜单）
 │   │   ├── Footer.tsx         # 页脚（导航链接/版权信息）
+│   │   ├── LanguageProvider.tsx # 中英文语言状态与自动翻译
 │   │   ├── ThemeProvider.tsx   # 主题管理（配色/深色模式）
 │   │   ├── FloatingSidebar.tsx # 悬浮侧栏（分类/弹窗图）
 │   │   ├── SafeHtml.tsx       # 安全HTML渲染（沙箱iframe）
@@ -296,6 +305,7 @@ mosaichub-portal/
 │       ├── prisma.ts          # Prisma 单例 + 优雅关闭
 │       ├── auth.ts            # JWT / 密码 / 权限工具
 │       ├── crypto.ts          # AES-256 加解密
+│       ├── i18n.ts            # 中英文词典、动态文本和日期格式化
 │       └── useSiteSettings.ts # 站点设置 Hook
 ├── .env.example               # 环境变量模板
 ├── next.config.js             # Next.js 配置（安全头/图片域名）
@@ -418,7 +428,7 @@ mosaichub-portal/
 **kou-n** — [@kou-xibin](https://gitee.com/kou-xibin)
 
 - **Email**: `837513034@qq.com`
-- **GitHub**: [kou-xibin](https://github.com/kou-xibin)
+- **GitHub**: [Anibl-1/mosaichub-portal](https://github.com/Anibl-1/mosaichub-portal)
 - **Gitee**: [kou-xibin/mosaichub-portal](https://gitee.com/kou-xibin/mosaichub-portal)
 
 ## 📄 开源协议
