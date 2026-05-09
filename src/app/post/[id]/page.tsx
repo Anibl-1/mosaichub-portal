@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Clock, Eye, User, MessageSquare, ArrowLeft, Send, ImagePlus, Paperclip, X, ChevronDown, ChevronUp, Reply, Star, ThumbsUp, ThumbsDown } from 'lucide-react'
 import EmojiPicker from '@/components/EmojiPicker'
 import SafeHtml from '@/components/SafeHtml'
+import { useLanguage } from '@/components/LanguageProvider'
+import { formatLocaleDateTime } from '@/lib/i18n'
 
 interface CommentData {
   id: number
@@ -27,6 +29,7 @@ interface Post {
 }
 
 export default function PostDetailPage({ params }: { params: { id: string } }) {
+  const { language, t } = useLanguage()
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [comment, setComment] = useState('')
@@ -70,7 +73,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
 
   const toggleReaction = async (type: string) => {
     const token = localStorage.getItem('token')
-    if (!token) { alert('请先登录'); window.location.href = '/login'; return }
+    if (!token) { alert(t('请先登录')); window.location.href = '/login'; return }
     try {
       await fetch(`/api/posts/${params.id}/reactions`, {
         method: 'POST',
@@ -112,7 +115,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
 
     const token = localStorage.getItem('token')
     if (!token) {
-      alert('请先登录后再评论')
+      alert(t('请先登录后再评论'))
       window.location.href = '/login'
       return
     }
@@ -141,10 +144,10 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
         fetchPost()
       } else {
         const data = await res.json()
-        alert(data.error || '评论失败')
+        alert(data.error || t('评论失败'))
       }
     } catch {
-      alert('网络错误')
+      alert(t('网络错误'))
     } finally {
       setSubmitting(false)
     }
@@ -157,6 +160,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
   }
 
   const totalComments = post ? post.comments.reduce((sum, c) => sum + 1 + (c.replies?.length || 0), 0) : 0
+  const fmtDateTime = (d: string) => formatLocaleDateTime(d, language)
 
   if (loading) {
     return (
@@ -177,8 +181,8 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
   if (!post) {
     return (
       <div className="max-w-[1000px] mx-auto px-4 py-12 text-center">
-        <p className="text-gray-500 text-lg">文章不存在</p>
-        <Link href="/" className="btn-red inline-block mt-4">返回首页</Link>
+        <p className="text-gray-500 text-lg">{t('文章不存在')}</p>
+        <Link href="/" className="btn-red inline-block mt-4">{t('返回首页')}</Link>
       </div>
     )
   }
@@ -193,28 +197,30 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
         <Link href="/" className="hover:text-bank-red flex items-center gap-1">
-          <ArrowLeft size={12} />首页
+          <ArrowLeft size={12} />{t('首页')}
         </Link>
         <span>&gt;</span>
-        <Link href={`/category/${post.category.slug}`} className="hover:text-bank-red">{post.category.name}</Link>
+        <Link href={`/category/${post.category.slug}`} data-no-translate className="hover:text-bank-red">{post.category.name}</Link>
         <span>&gt;</span>
-        <span className="text-gray-700 truncate max-w-[300px]">{post.title}</span>
+        <span data-no-translate className="text-gray-700 truncate max-w-[300px]">{post.title}</span>
       </div>
 
       {/* Article */}
       <article className="card">
         <div className="section-header-red">
-          <span className="text-sm font-bold">{post.category.name}</span>
+          <span data-no-translate className="text-sm font-bold">{post.category.name}</span>
         </div>
         <div className="p-6 md:p-8">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{post.title}</h1>
+          <h1 data-no-translate className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{post.title}</h1>
           <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400 mb-5 pb-5 border-b border-gray-100 dark:border-gray-700">
             <span className="flex items-center gap-1"><User size={12} />{post.author.username}</span>
-            <span className="flex items-center gap-1"><Clock size={12} />{new Date(post.createdAt).toLocaleString('zh-CN')}</span>
-            <span className="flex items-center gap-1"><Eye size={12} />{post.viewCount} 次浏览</span>
-            <span className="flex items-center gap-1"><MessageSquare size={12} />{totalComments} 条评论</span>
+            <span className="flex items-center gap-1"><Clock size={12} />{fmtDateTime(post.createdAt)}</span>
+            <span className="flex items-center gap-1"><Eye size={12} />{language === 'en' ? `${post.viewCount} views` : `${post.viewCount} 次浏览`}</span>
+            <span className="flex items-center gap-1"><MessageSquare size={12} />{language === 'en' ? `${totalComments} comments` : `${totalComments} 条评论`}</span>
           </div>
-          <SafeHtml html={post.content} className="rounded" minHeight={100} />
+          <div data-no-translate>
+            <SafeHtml html={post.content} className="rounded" minHeight={100} />
+          </div>
 
           {/* Reactions */}
           <div className="flex items-center justify-center gap-6 mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
@@ -227,7 +233,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
               }`}
             >
               <Star size={16} className={reactions.userReactions.includes('FAVORITE') ? 'fill-amber-500' : ''} />
-              收藏 {reactions.favorite}
+              {t('收藏')} {reactions.favorite}
             </button>
             <button
               onClick={() => toggleReaction('SUPPORT')}
@@ -238,7 +244,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
               }`}
             >
               <ThumbsUp size={16} className={reactions.userReactions.includes('SUPPORT') ? 'fill-green-500' : ''} />
-              支持 {reactions.support}
+              {t('支持')} {reactions.support}
             </button>
             <button
               onClick={() => toggleReaction('OPPOSE')}
@@ -249,7 +255,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
               }`}
             >
               <ThumbsDown size={16} className={reactions.userReactions.includes('OPPOSE') ? 'fill-red-500' : ''} />
-              反对 {reactions.oppose}
+              {t('反对')} {reactions.oppose}
             </button>
           </div>
         </div>
@@ -259,7 +265,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
       <div className="card mt-4">
         <div className="section-header">
           <span className="text-sm font-bold flex items-center gap-2">
-            <MessageSquare size={14} />评论区 ({totalComments})
+            <MessageSquare size={14} />{t('评论区')} ({totalComments})
           </span>
         </div>
 
@@ -274,10 +280,10 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm text-gray-800 dark:text-gray-200">{c.author.username}</span>
-                    <span className="text-[10px] text-gray-400">{new Date(c.createdAt).toLocaleString('zh-CN')}</span>
-                    <span className="text-[10px] text-gray-300">#{idx + 1}楼</span>
+                    <span className="text-[10px] text-gray-400">{fmtDateTime(c.createdAt)}</span>
+                    <span className="text-[10px] text-gray-300">{language === 'en' ? `#${idx + 1}` : `#${idx + 1}楼`}</span>
                   </div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{c.content}</div>
+                  <div data-no-translate className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{c.content}</div>
                   {/* Comment images */}
                   {c.images && (() => {
                     try {
@@ -294,7 +300,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                   {user && (
                     <button onClick={() => handleReply(c.id, c.author.username)}
                       className="mt-1.5 text-[10px] text-gray-400 hover:text-bank-red flex items-center gap-1 transition-colors">
-                      <Reply size={10} />回复
+                      <Reply size={10} />{t('回复')}
                     </button>
                   )}
 
@@ -305,9 +311,9 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                         <div key={reply.id} className="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-2.5">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium text-xs text-bank-red">{reply.author.username}</span>
-                            <span className="text-[10px] text-gray-400">{new Date(reply.createdAt).toLocaleString('zh-CN')}</span>
+                            <span className="text-[10px] text-gray-400">{fmtDateTime(reply.createdAt)}</span>
                           </div>
-                          <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                          <p data-no-translate className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
                           {reply.images && (() => {
                             try {
                               const imgs = JSON.parse(reply.images) as string[]
@@ -328,7 +334,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
               </div>
             </div>
           )) : (
-            <p className="text-center text-gray-400 py-10 text-sm">暂无评论，快来抢沙发吧！</p>
+            <p className="text-center text-gray-400 py-10 text-sm">{t('暂无评论，快来抢沙发吧！')}</p>
           )}
         </div>
 
@@ -339,7 +345,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
               {replyTo && (
                 <div className="flex items-center gap-2 mb-2 text-xs text-bank-red bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded">
                   <Reply size={12} />
-                  回复 <strong>{replyTo.username}</strong>
+                  {t('回复')} <strong>{replyTo.username}</strong>
                   <button type="button" onClick={() => setReplyTo(null)} className="ml-auto text-gray-400 hover:text-red-500"><X size={12} /></button>
                 </div>
               )}
@@ -349,7 +355,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                 onChange={e => setComment(e.target.value)}
                 className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-bank-red focus:border-transparent outline-none resize-none"
                 rows={advancedMode ? 8 : 3}
-                placeholder={replyTo ? `回复 ${replyTo.username}...` : '发表您的评论...'}
+                placeholder={replyTo ? `${t('回复')} ${replyTo.username}...` : t('发表您的评论...')}
                 required
               />
 
@@ -358,9 +364,9 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                   <div className="flex items-center gap-2">
                     <button type="button" onClick={() => imgInputRef.current?.click()} disabled={uploading}
                       className="flex items-center gap-1 text-xs px-3 py-1.5 border rounded hover:border-bank-red hover:text-bank-red transition-colors">
-                      <ImagePlus size={13} />{uploading ? '上传中...' : '插入图片'}
+                      <ImagePlus size={13} />{uploading ? t('上传中...') : t('插入图片')}
                     </button>
-                    <span className="text-[10px] text-gray-400">支持 jpg/png/gif，最大10MB</span>
+                    <span className="text-[10px] text-gray-400">{t('支持 jpg/png/gif，最大10MB')}</span>
                   </div>
                   <input ref={imgInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleUploadImage} />
 
@@ -386,19 +392,19 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                   <button type="button" onClick={() => setAdvancedMode(!advancedMode)}
                     className="text-xs text-gray-400 hover:text-bank-red flex items-center gap-1 transition-colors">
                     {advancedMode ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                    {advancedMode ? '简洁模式' : '高级模式 (可添加图片)'}
+                    {advancedMode ? t('简洁模式') : t('高级模式 (可添加图片)')}
                   </button>
                 </div>
                 <button type="submit" disabled={submitting || !comment.trim()}
                   className="btn-red text-xs px-4 py-1.5 flex items-center gap-1 disabled:opacity-50">
-                  <Send size={12} />{submitting ? '提交中...' : '发表评论'}
+                  <Send size={12} />{submitting ? t('提交中...') : t('发表评论')}
                 </button>
               </div>
             </form>
           ) : (
             <div className="text-center py-6">
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">登录后可以参与评论互动</p>
-              <Link href="/login" className="btn-red inline-block text-sm px-6 py-1.5">立即登录</Link>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{t('登录后可以参与评论互动')}</p>
+              <Link href="/login" className="btn-red inline-block text-sm px-6 py-1.5">{t('立即登录')}</Link>
             </div>
           )}
         </div>

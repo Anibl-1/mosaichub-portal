@@ -4,6 +4,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FloatingSidebar from '@/components/FloatingSidebar'
 import ThemeProvider from '@/components/ThemeProvider'
+import { LanguageProvider } from '@/components/LanguageProvider'
 import { prisma } from '@/lib/prisma'
 
 async function getSiteMetadata(): Promise<Metadata> {
@@ -34,14 +35,16 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body>
-        <ThemeProvider>
-          <Header />
-          <main className="min-h-[calc(100vh-200px)]">
-            {children}
-          </main>
-          <FloatingSidebar />
-          <Footer />
-        </ThemeProvider>
+        <LanguageProvider>
+          <ThemeProvider>
+            <Header />
+            <main className="min-h-[calc(100vh-200px)]">
+              {children}
+            </main>
+            <FloatingSidebar />
+            <Footer />
+          </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   )

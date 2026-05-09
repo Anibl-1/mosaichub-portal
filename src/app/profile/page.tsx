@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { User, Mail, Phone, Shield, Calendar, Edit3, FileText, MessageSquare, Home, Settings, PenSquare, AlertTriangle, Megaphone, ChevronRight, Lock, Eye, EyeOff } from 'lucide-react'
+import { useLanguage } from '@/components/LanguageProvider'
+import { formatLocaleDate } from '@/lib/i18n'
 
 interface UserInfo {
   id: number
@@ -15,6 +17,7 @@ interface UserInfo {
 }
 
 export default function ProfilePage() {
+  const { language, t } = useLanguage()
   const [user, setUser] = useState<UserInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -89,13 +92,13 @@ export default function ProfilePage() {
         const data = await res.json()
         setUser(data)
         setEditing(false)
-        setMessage('个人信息更新成功')
+        setMessage(t('个人信息更新成功'))
       } else {
         const data = await res.json()
-        setMessage(data.error || '更新失败')
+        setMessage(data.error || t('更新失败'))
       }
     } catch {
-      setMessage('网络错误')
+      setMessage(t('网络错误'))
     }
   }
 
@@ -103,13 +106,13 @@ export default function ProfilePage() {
     e.preventDefault()
     setPwdMsg('')
     if (!pwdForm.oldPassword || !pwdForm.newPassword || !pwdForm.confirmPassword) {
-      setPwdMsg('请填写完整信息'); setPwdMsgType('error'); return
+      setPwdMsg(t('请填写完整信息')); setPwdMsgType('error'); return
     }
     if (pwdForm.newPassword.length < 6) {
-      setPwdMsg('新密码长度至少6位'); setPwdMsgType('error'); return
+      setPwdMsg(t('新密码长度至少6位')); setPwdMsgType('error'); return
     }
     if (pwdForm.newPassword !== pwdForm.confirmPassword) {
-      setPwdMsg('两次输入的新密码不一致'); setPwdMsgType('error'); return
+      setPwdMsg(t('两次输入的新密码不一致')); setPwdMsgType('error'); return
     }
     const token = localStorage.getItem('token')
     if (!token) return
@@ -121,14 +124,14 @@ export default function ProfilePage() {
       })
       const data = await res.json()
       if (res.ok) {
-        setPwdMsg('密码修改成功'); setPwdMsgType('success')
+        setPwdMsg(t('密码修改成功')); setPwdMsgType('success')
         setPwdForm({ oldPassword: '', newPassword: '', confirmPassword: '' })
         setTimeout(() => setShowPwdForm(false), 1500)
       } else {
-        setPwdMsg(data.error || '修改失败'); setPwdMsgType('error')
+        setPwdMsg(data.error || t('修改失败')); setPwdMsgType('error')
       }
     } catch {
-      setPwdMsg('网络错误'); setPwdMsgType('error')
+      setPwdMsg(t('网络错误')); setPwdMsgType('error')
     }
   }
 
@@ -154,9 +157,9 @@ export default function ProfilePage() {
     <div className="max-w-[1200px] mx-auto px-4 py-5">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
-        <Link href="/" className="hover:text-bank-red flex items-center gap-1"><Home size={11} />首页</Link>
+        <Link href="/" className="hover:text-bank-red flex items-center gap-1"><Home size={11} />{t('首页')}</Link>
         <span>&gt;</span>
-        <span className="text-gray-700 dark:text-gray-300">个人中心</span>
+        <span className="text-gray-700 dark:text-gray-300">{t('个人中心')}</span>
       </div>
 
       {/* Profile Hero */}
@@ -167,25 +170,25 @@ export default function ProfilePage() {
               {user.username.charAt(0).toUpperCase()}
             </div>
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-2xl font-bold text-white">{user.realName || user.username}</h1>
+              <h1 data-no-translate className="text-2xl font-bold text-white">{user.realName || user.username}</h1>
               <p className="text-blue-200 text-sm mt-1">@{user.username}</p>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3">
                 <span className={`inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full ${user.role === 'SUPER_ADMIN' ? 'bg-purple-500/20 text-purple-200' : user.role === 'ADMIN' ? 'bg-amber-500/20 text-amber-200' : 'bg-white/10 text-blue-200'}`}>
-                  <Shield size={11} />{user.role === 'SUPER_ADMIN' ? '超级管理员' : user.role === 'ADMIN' ? '系统管理员' : '普通用户'}
+                  <Shield size={11} />{user.role === 'SUPER_ADMIN' ? t('超级管理员') : user.role === 'ADMIN' ? t('系统管理员') : t('普通用户')}
                 </span>
                 <span className="text-xs text-blue-200/60 flex items-center gap-1">
-                  <Calendar size={11} />已注册 {daysSinceRegistration} 天
+                  <Calendar size={11} />{language === 'en' ? `Registered ${daysSinceRegistration} days ago` : `已注册 ${daysSinceRegistration} 天`}
                 </span>
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setEditing(!editing)}
                 className="flex items-center gap-1.5 text-xs bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
-                <Edit3 size={12} />{editing ? '取消编辑' : '编辑资料'}
+                <Edit3 size={12} />{editing ? t('取消编辑') : t('编辑资料')}
               </button>
               {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
                 <Link href="/admin" className="flex items-center gap-1.5 text-xs bg-bank-red/80 hover:bg-bank-red text-white px-4 py-2 rounded-lg transition-colors">
-                  <Settings size={12} />管理中心
+                  <Settings size={12} />{t('管理中心')}
                 </Link>
               )}
             </div>
@@ -195,9 +198,9 @@ export default function ProfilePage() {
         {/* Stats Bar */}
         <div className="grid grid-cols-3 divide-x dark:divide-gray-700">
           {[
-            { label: '文章数', value: stats.posts, icon: <FileText size={16} className="text-bank-primary" /> },
-            { label: '评论数', value: stats.comments, icon: <MessageSquare size={16} className="text-green-500" /> },
-            { label: '信访/建议', value: stats.petitions, icon: <AlertTriangle size={16} className="text-amber-500" /> },
+            { label: t('文章数'), value: stats.posts, icon: <FileText size={16} className="text-bank-primary" /> },
+            { label: t('评论数'), value: stats.comments, icon: <MessageSquare size={16} className="text-green-500" /> },
+            { label: t('信访/建议'), value: stats.petitions, icon: <AlertTriangle size={16} className="text-amber-500" /> },
           ].map(item => (
             <div key={item.label} className="flex items-center justify-center gap-3 py-4 px-2">
               {item.icon}
@@ -221,17 +224,17 @@ export default function ProfilePage() {
         <div className="lg:col-span-8">
           <div className="card">
             <div className="section-header">
-              <span className="text-sm font-bold">{editing ? '编辑个人信息' : '个人信息'}</span>
+              <span className="text-sm font-bold">{editing ? t('编辑个人信息') : t('个人信息')}</span>
             </div>
 
             {!editing ? (
               <div className="divide-y dark:divide-gray-700">
                 {[
-                  { icon: <User size={16} className="text-bank-primary" />, label: '真实姓名', value: user.realName || '未填写' },
-                  { icon: <Mail size={16} className="text-bank-primary" />, label: '邮箱地址', value: user.email || '未填写' },
-                  { icon: <Phone size={16} className="text-bank-primary" />, label: '手机号码', value: user.phone || '未填写' },
-                  { icon: <Shield size={16} className="text-bank-primary" />, label: '账户角色', value: user.role === 'SUPER_ADMIN' ? '超级管理员' : user.role === 'ADMIN' ? '系统管理员' : '普通用户' },
-                  { icon: <Calendar size={16} className="text-bank-primary" />, label: '注册时间', value: new Date(user.createdAt).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) },
+                  { icon: <User size={16} className="text-bank-primary" />, label: t('真实姓名'), value: user.realName || t('未填写') },
+                  { icon: <Mail size={16} className="text-bank-primary" />, label: t('邮箱地址'), value: user.email || t('未填写') },
+                  { icon: <Phone size={16} className="text-bank-primary" />, label: t('手机号码'), value: user.phone || t('未填写') },
+                  { icon: <Shield size={16} className="text-bank-primary" />, label: t('账户角色'), value: user.role === 'SUPER_ADMIN' ? t('超级管理员') : user.role === 'ADMIN' ? t('系统管理员') : t('普通用户') },
+                  { icon: <Calendar size={16} className="text-bank-primary" />, label: t('注册时间'), value: formatLocaleDate(user.createdAt, language, { year: 'numeric', month: 'long', day: 'numeric' }) },
                 ].map(item => (
                   <div key={item.label} className="flex items-center gap-4 px-5 py-4">
                     <div className="w-9 h-9 bg-bank-primary/5 dark:bg-bank-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -239,7 +242,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex-1">
                       <p className="text-[11px] text-gray-400">{item.label}</p>
-                      <p className="text-sm text-gray-800 dark:text-gray-200 mt-0.5">{item.value}</p>
+                      <p data-no-translate={item.label === t('真实姓名') || item.label === t('邮箱地址') || item.label === t('手机号码') ? true : undefined} className="text-sm text-gray-800 dark:text-gray-200 mt-0.5">{item.value}</p>
                     </div>
                   </div>
                 ))}
@@ -247,9 +250,9 @@ export default function ProfilePage() {
             ) : (
               <form onSubmit={handleUpdate} className="p-5 space-y-4">
                 {[
-                  { label: '真实姓名', key: 'realName' as const, type: 'text', placeholder: '请输入真实姓名' },
-                  { label: '邮箱地址', key: 'email' as const, type: 'email', placeholder: '请输入邮箱地址' },
-                  { label: '手机号码', key: 'phone' as const, type: 'tel', placeholder: '请输入手机号码' },
+                  { label: t('真实姓名'), key: 'realName' as const, type: 'text', placeholder: t('请输入真实姓名') },
+                  { label: t('邮箱地址'), key: 'email' as const, type: 'email', placeholder: t('请输入邮箱地址') },
+                  { label: t('手机号码'), key: 'phone' as const, type: 'tel', placeholder: t('请输入手机号码') },
                 ].map(field => (
                   <div key={field.key}>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{field.label}</label>
@@ -263,9 +266,9 @@ export default function ProfilePage() {
                   </div>
                 ))}
                 <div className="flex gap-3 pt-2">
-                  <button type="submit" className="btn-primary flex items-center gap-2"><Edit3 size={14} />保存修改</button>
+                  <button type="submit" className="btn-primary flex items-center gap-2"><Edit3 size={14} />{t('保存修改')}</button>
                   <button type="button" onClick={() => setEditing(false)}
-                    className="px-6 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-300 transition-colors">取消</button>
+                    className="px-6 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-300 transition-colors">{t('取消')}</button>
                 </div>
               </form>
             )}
@@ -277,14 +280,14 @@ export default function ProfilePage() {
           {/* Quick Actions */}
           <div className="card">
             <div className="section-header-red">
-              <span className="text-sm font-bold">快捷操作</span>
+              <span className="text-sm font-bold">{t('快捷操作')}</span>
             </div>
             <div className="p-3 space-y-1">
               {[
-                { href: '/post/create', label: '发布文章', icon: <PenSquare size={14} className="text-blue-500" /> },
-                { href: '/petition?type=feedback', label: '提交反馈', icon: <AlertTriangle size={14} className="text-bank-red" /> },
-                { href: '/petition?type=suggestion', label: '提交建议', icon: <Megaphone size={14} className="text-amber-500" /> },
-                { href: '/search', label: '搜索文章', icon: <FileText size={14} className="text-green-500" /> },
+                { href: '/post/create', label: t('发布文章'), icon: <PenSquare size={14} className="text-blue-500" /> },
+                { href: '/petition?type=feedback', label: t('提交反馈'), icon: <AlertTriangle size={14} className="text-bank-red" /> },
+                { href: '/petition?type=suggestion', label: t('提交建议'), icon: <Megaphone size={14} className="text-amber-500" /> },
+                { href: '/search', label: t('搜索文章'), icon: <FileText size={14} className="text-green-500" /> },
               ].map(item => (
                 <Link key={item.href} href={item.href}
                   className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
@@ -299,24 +302,24 @@ export default function ProfilePage() {
           <div className="card">
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">账户安全</h3>
+                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('账户安全')}</h3>
                 <button onClick={() => { setShowPwdForm(!showPwdForm); setPwdMsg('') }}
                   className="text-[10px] text-bank-primary hover:text-bank-red transition-colors flex items-center gap-1">
-                  <Lock size={10} />{showPwdForm ? '收起' : '修改密码'}
+                  <Lock size={10} />{showPwdForm ? t('收起') : t('修改密码')}
                 </button>
               </div>
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500 dark:text-gray-400">登录密码</span>
-                  <span className="text-green-500">已设置</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t('登录密码')}</span>
+                  <span className="text-green-500">{t('已设置')}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500 dark:text-gray-400">手机绑定</span>
-                  <span className={user.phone ? 'text-green-500' : 'text-gray-300'}>{user.phone ? '已绑定' : '未绑定'}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t('手机绑定')}</span>
+                  <span className={user.phone ? 'text-green-500' : 'text-gray-300'}>{user.phone ? t('已绑定') : t('未绑定')}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500 dark:text-gray-400">邮箱绑定</span>
-                  <span className={user.email ? 'text-green-500' : 'text-gray-300'}>{user.email ? '已绑定' : '未绑定'}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t('邮箱绑定')}</span>
+                  <span className={user.email ? 'text-green-500' : 'text-gray-300'}>{user.email ? t('已绑定') : t('未绑定')}</span>
                 </div>
               </div>
             </div>
@@ -329,13 +332,13 @@ export default function ProfilePage() {
                 )}
                 <form onSubmit={handleChangePassword} className="space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">原密码</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{t('原密码')}</label>
                     <div className="relative">
                       <input
                         type={showOld ? 'text' : 'password'}
                         value={pwdForm.oldPassword}
                         onChange={e => setPwdForm({ ...pwdForm, oldPassword: e.target.value })}
-                        placeholder="请输入原密码"
+                        placeholder={t('请输入原密码')}
                         className="w-full px-3 py-2 pr-9 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-bank-primary focus:border-transparent outline-none"
                       />
                       <button type="button" onClick={() => setShowOld(!showOld)}
@@ -345,13 +348,13 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">新密码</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{t('新密码')}</label>
                     <div className="relative">
                       <input
                         type={showNew ? 'text' : 'password'}
                         value={pwdForm.newPassword}
                         onChange={e => setPwdForm({ ...pwdForm, newPassword: e.target.value })}
-                        placeholder="请输入新密码（至少6位）"
+                        placeholder={t('请输入新密码（至少6位）')}
                         className="w-full px-3 py-2 pr-9 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-bank-primary focus:border-transparent outline-none"
                       />
                       <button type="button" onClick={() => setShowNew(!showNew)}
@@ -361,17 +364,17 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">确认新密码</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{t('确认新密码')}</label>
                     <input
                       type="password"
                       value={pwdForm.confirmPassword}
                       onChange={e => setPwdForm({ ...pwdForm, confirmPassword: e.target.value })}
-                      placeholder="请再次输入新密码"
+                      placeholder={t('请再次输入新密码')}
                       className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-bank-primary focus:border-transparent outline-none"
                     />
                   </div>
                   <button type="submit" className="w-full btn-red text-xs py-2 flex items-center justify-center gap-1.5">
-                    <Lock size={12} />确认修改密码
+                    <Lock size={12} />{t('确认修改密码')}
                   </button>
                 </form>
               </div>
@@ -381,7 +384,7 @@ export default function ProfilePage() {
           {/* Tip */}
           <div className="card p-4">
             <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
-              <strong className="text-gray-600 dark:text-gray-400">安全提示：</strong>请妥善保管您的账户信息，定期修改密码，不要将密码透露给他人。如有账户异常，请及时联系客服。
+              <strong className="text-gray-600 dark:text-gray-400">{t('安全提示：')}</strong>{t('请妥善保管您的账户信息，定期修改密码，不要将密码透露给他人。如有账户异常，请及时联系客服。')}
             </p>
           </div>
         </div>

@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { User, LogOut, Settings, Menu, X, Search, Phone, PenSquare, Moon, Sun, ChevronDown, Palette } from 'lucide-react'
+import { User, LogOut, Settings, Menu, X, Search, Phone, PenSquare, Moon, Sun, ChevronDown, Palette, Languages } from 'lucide-react'
 import { useTheme, THEME_PRESETS } from './ThemeProvider'
 import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useLanguage } from './LanguageProvider'
+import { translateText } from '@/lib/i18n'
 
 interface NavMenuItem {
   id: number
@@ -27,6 +29,7 @@ const normalizeUrl = (url: string) => {
 export default function Header() {
   const router = useRouter()
   const { theme, toggleTheme, themeColor, setThemeColor } = useTheme()
+  const { language, toggleLanguage, t } = useLanguage()
   const [user, setUser] = useState<{ username: string; role: string; permissions?: string[] } | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -37,9 +40,9 @@ export default function Header() {
   const siteSettings = useSiteSettings()
 
   const defaultNav = [
-    { href: '/', label: '首页' },
+    { href: '/', label: t('首页') },
     ...categories.map(c => ({ href: `/category/${c.slug}`, label: c.name })),
-    { href: '/search', label: '信息查询' },
+    { href: '/search', label: t('信息查询') },
   ]
 
   useEffect(() => {
@@ -87,20 +90,20 @@ export default function Header() {
         <div className="max-w-[1200px] mx-auto px-4 flex justify-between items-center text-xs h-8">
           <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
             <span>{siteSettings.site_name}</span>
-            {siteSettings.site_hotline && <span className="flex items-center gap-1"><Phone size={11} />客服热线：{siteSettings.site_hotline}</span>}
+            {siteSettings.site_hotline && <span className="flex items-center gap-1"><Phone size={11} />{t('客服热线：')}{siteSettings.site_hotline}</span>}
           </div>
           <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
             <div className="relative">
-              <button onClick={() => setShowColorPicker(!showColorPicker)} className="flex items-center gap-1 hover:text-bank-red transition-colors" title="切换主题色">
+              <button onClick={() => setShowColorPicker(!showColorPicker)} className="flex items-center gap-1 hover:text-bank-red transition-colors" title={t('切换主题色')}>
                 <Palette size={12} />
                 <span className="w-2.5 h-2.5 rounded-full ring-1 ring-gray-300 dark:ring-gray-500" style={{ background: THEME_PRESETS.find(p => p.key === themeColor)?.red || '#c4161c' }} />
-                <span className="hidden sm:inline">颜色</span>
+                <span className="hidden sm:inline">{t('颜色')}</span>
               </button>
               {showColorPicker && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowColorPicker(false)} />
                   <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-3 z-50 w-[280px] animate-[fadeIn_0.15s_ease-out]">
-                    <p className="text-[10px] text-gray-400 mb-2 font-medium">选择主题配色</p>
+                    <p className="text-[10px] text-gray-400 mb-2 font-medium">{t('选择主题配色')}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {THEME_PRESETS.map(preset => {
                         const active = themeColor === preset.key
@@ -115,7 +118,7 @@ export default function Header() {
                               <span className="w-3.5 h-3.5 rounded-full ring-1 ring-black/10" style={{ background: preset.red }} />
                               <span className="w-3.5 h-3.5 rounded-full ring-1 ring-black/10" style={{ background: preset.accent }} />
                             </div>
-                            <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">{preset.label}</span>
+                            <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">{translateText(preset.label, language)}</span>
                             {active && <span className="absolute top-1 right-1 w-3 h-3 rounded-full bg-green-500 text-white text-[7px] flex items-center justify-center">✓</span>}
                           </button>
                         )
@@ -125,9 +128,13 @@ export default function Header() {
                 </>
               )}
             </div>
-            <button onClick={toggleTheme} className="flex items-center gap-1 hover:text-bank-red transition-colors" title={theme === 'dark' ? '切换亮色模式' : '切换暗色模式'}>
+            <button onClick={toggleTheme} className="flex items-center gap-1 hover:text-bank-red transition-colors" title={theme === 'dark' ? t('切换亮色模式') : t('切换暗色模式')}>
               {theme === 'dark' ? <Sun size={12} /> : <Moon size={12} />}
-              <span className="hidden sm:inline">{theme === 'dark' ? '亮色' : '暗色'}</span>
+              <span className="hidden sm:inline">{theme === 'dark' ? t('亮色') : t('暗色')}</span>
+            </button>
+            <button onClick={toggleLanguage} className="flex items-center gap-1 hover:text-bank-red transition-colors" title={t('切换语言')}>
+              <Languages size={12} />
+              <span className="hidden sm:inline">{language === 'zh-CN' ? 'EN' : '中文'}</span>
             </button>
             <span className="text-gray-300 dark:text-gray-600">|</span>
             {user ? (
@@ -135,7 +142,7 @@ export default function Header() {
                 {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (user.role === 'SUPER_ADMIN' || (user.permissions || []).includes('publish') || (user.permissions || []).some(p => p.startsWith('publish:'))) && (
                   <>
                     <Link href="/post/create" className="flex items-center gap-1 hover:text-bank-red transition-colors">
-                      <PenSquare size={12} />发布文章
+                      <PenSquare size={12} />{t('发布文章')}
                     </Link>
                     <span className="text-gray-300 dark:text-gray-600">|</span>
                   </>
@@ -147,20 +154,20 @@ export default function Header() {
                   <>
                     <span className="text-gray-300 dark:text-gray-600">|</span>
                     <Link href="/admin" className="flex items-center gap-1 hover:text-bank-red transition-colors">
-                      <Settings size={12} />管理中心
+                      <Settings size={12} />{t('管理中心')}
                     </Link>
                   </>
                 )}
                 <span className="text-gray-300 dark:text-gray-600">|</span>
                 <button onClick={handleLogout} className="flex items-center gap-1 hover:text-bank-red transition-colors">
-                  <LogOut size={12} />退出
+                  <LogOut size={12} />{t('退出')}
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="hover:text-bank-red transition-colors">登录</Link>
+                <Link href="/login" className="hover:text-bank-red transition-colors">{t('登录')}</Link>
                 <span className="text-gray-300 dark:text-gray-600">|</span>
-                <Link href="/register" className="hover:text-bank-red transition-colors">注册</Link>
+                <Link href="/register" className="hover:text-bank-red transition-colors">{t('注册')}</Link>
               </>
             )}
           </div>
@@ -187,7 +194,7 @@ export default function Header() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-56 px-3 py-1.5 border border-gray-300 rounded-l text-sm focus:outline-none focus:border-bank-red dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-                placeholder="搜索文章..."
+                placeholder={t('搜索文章...')}
               />
               <button type="submit" className="bg-bank-red text-white px-4 py-1.5 rounded-r text-sm hover:bg-bank-redDark transition-colors">
                 <Search size={14} />
@@ -213,6 +220,7 @@ export default function Header() {
                   {menu.url ? (
                     <Link
                       href={normalizeUrl(menu.url)}
+                      data-no-translate
                       target={menu.url.startsWith('http') || menu.url.match(/^[a-zA-Z0-9].*\./) ? '_blank' : undefined}
                       rel={menu.url.startsWith('http') || menu.url.match(/^[a-zA-Z0-9].*\./) ? 'noopener noreferrer' : undefined}
                       className={`text-white text-[13px] font-bold px-5 py-2.5 flex items-center gap-0.5 transition-colors whitespace-nowrap ${idx === 0 ? 'bg-white/20' : 'hover:bg-white/15'} ${menu.name === '专栏' ? 'bg-white/25' : ''}`}
@@ -222,6 +230,7 @@ export default function Header() {
                     </Link>
                   ) : (
                     <button
+                      data-no-translate
                       className="text-white text-[13px] font-bold px-5 py-2.5 flex items-center gap-0.5 hover:bg-white/15 transition-colors whitespace-nowrap"
                     >
                       {menu.name}
@@ -236,6 +245,7 @@ export default function Header() {
                           <a
                             key={child.id}
                             href={normalizeUrl(child.url)}
+                            data-no-translate
                             target={child.url.startsWith('http') || child.url.match(/^[a-zA-Z0-9].*\./) ? '_blank' : '_self'}
                             rel={child.url.startsWith('http') || child.url.match(/^[a-zA-Z0-9].*\./) ? 'noopener noreferrer' : undefined}
                             className="group flex items-center gap-2 px-4 py-2.5 text-[13px] text-gray-600 dark:text-gray-300 hover:bg-bank-primary hover:text-white dark:hover:bg-gray-700 transition-all duration-150 border-b border-gray-100/80 dark:border-gray-700 last:border-b-0"
@@ -244,7 +254,7 @@ export default function Header() {
                             {child.name}
                           </a>
                         ) : (
-                          <span key={child.id} className="block px-4 py-2.5 text-[13px] text-gray-400">{child.name}</span>
+                          <span key={child.id} data-no-translate className="block px-4 py-2.5 text-[13px] text-gray-400">{child.name}</span>
                         )
                       ))}
                     </div>
@@ -255,6 +265,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  data-no-translate
                   className={`text-white text-[13px] font-bold px-5 py-2.5 hover:bg-white/15 transition-colors whitespace-nowrap ${idx === 0 ? 'bg-white/20' : ''}`}
                 >
                   {item.label}
@@ -264,7 +275,7 @@ export default function Header() {
 
             {/* Quick Nav Button */}
             <Link href="/search" className="hidden md:flex items-center gap-1 text-white text-[12px] font-bold px-3 py-1.5 rounded bg-white/15 hover:bg-white/25 transition-colors whitespace-nowrap ml-2">
-              <Search size={12} />快捷导航
+              <Search size={12} />{t('快捷导航')}
             </Link>
 
             {/* Mobile Menu Button */}
@@ -279,7 +290,8 @@ export default function Header() {
               {(navMenus.length > 0 ? navMenus : defaultNav.map((n, i) => ({ id: i, name: n.label, url: n.href, children: [] as NavMenuItem[] }))).map(menu => (
                 <div key={menu.id}>
                   {menu.url ? (
-                    <Link href={normalizeUrl(menu.url)} className="block py-2 text-white text-sm hover:bg-white/10 px-2 rounded">
+                    <Link key={menu.id} href={normalizeUrl(menu.url || '#')} data-no-translate
+                      className="block py-2 text-white text-sm hover:bg-white/10 px-2 rounded">
                       {menu.name}
                     </Link>
                   ) : (
@@ -287,10 +299,11 @@ export default function Header() {
                   )}
                   {menu.children.map(child => (
                     child.url ? (
-                      <a key={child.id} href={normalizeUrl(child.url)} target={child.url.startsWith('http') || child.url.match(/^[a-zA-Z0-9].*\./) ? '_blank' : '_self'}
+                      <Link key={child.id} href={normalizeUrl(child.url || '#')} data-no-translate
+                        target={child.url.startsWith('http') || child.url.match(/^[a-zA-Z0-9].*\./) ? '_blank' : '_self'}
                         className="block py-1.5 pl-6 text-white/70 text-xs hover:text-white hover:bg-white/10 rounded">
                         {child.name}
-                      </a>
+                      </Link>
                     ) : null
                   ))}
                 </div>

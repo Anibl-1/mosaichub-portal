@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Layers, FolderOpen, X } from 'lucide-react'
+import { useLanguage } from './LanguageProvider'
 
 export default function FloatingSidebar() {
+  const { t } = useLanguage()
   const [showLeft, setShowLeft] = useState(true)
   const [showRight, setShowRight] = useState(true)
   const [showPopup, setShowPopup] = useState(false)
@@ -58,7 +60,7 @@ export default function FloatingSidebar() {
                   {leftChars.map((ch, i) => (
                     <div key={i} className={`text-white font-black text-sm leading-tight tracking-wider${i > 0 && i % 2 === 0 ? ' mt-0.5' : ''}`}>{ch}</div>
                   ))}
-                  <div className="text-white/50 text-[7px] mt-2 border-t border-white/20 pt-1.5">查看详情</div>
+                  <div className="text-white/50 text-[7px] mt-2 border-t border-white/20 pt-1.5">{t('查看详情')}</div>
                 </div>
               )}
             </button>
@@ -83,7 +85,7 @@ export default function FloatingSidebar() {
                   <FolderOpen size={20} className="text-white mx-auto mb-1.5" />
                   <div className="text-white font-black text-[10px] leading-snug">{rightLine1}</div>
                   {rightLine2 && <div className="text-white font-bold text-xs mt-1 tracking-wider">{rightLine2}</div>}
-                  <div className="text-white/50 text-[7px] mt-1.5 border-t border-white/20 pt-1.5">查看详情</div>
+                  <div className="text-white/50 text-[7px] mt-1.5 border-t border-white/20 pt-1.5">{t('查看详情')}</div>
                 </div>
               )}
             </Link>
@@ -99,7 +101,7 @@ export default function FloatingSidebar() {
       {showPopup && popupImage && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowPopup(false)}>
           <div className="relative max-w-3xl max-h-[90vh] mx-4 animate-[fadeIn_0.2s_ease-out]" onClick={e => e.stopPropagation()}>
-            <img src={popupImage} alt="详情" className="max-w-full max-h-[85vh] rounded-lg shadow-2xl object-contain" />
+            <img src={popupImage} alt={t('详情')} className="max-w-full max-h-[85vh] rounded-lg shadow-2xl object-contain" />
             <button onClick={() => setShowPopup(false)}
               className="absolute -top-3 -right-3 w-8 h-8 bg-white text-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors">
               <X size={18} />

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useLanguage } from './LanguageProvider'
 
 interface NavMenuItem {
   id: number
@@ -13,6 +14,7 @@ interface NavMenuItem {
 
 export default function Footer() {
   const s = useSiteSettings()
+  const { t } = useLanguage()
   const [navMenus, setNavMenus] = useState<NavMenuItem[]>([])
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export default function Footer() {
 
   const footerLinks = navMenus.length > 0
     ? navMenus.map(m => ({ href: m.url || '#', label: m.name }))
-    : [{ href: '/', label: '网站首页' }]
+    : [{ href: '/', label: t('网站首页') }]
 
   return (
     <footer>
@@ -45,12 +47,12 @@ export default function Footer() {
         <div className="border-t border-white/10">
           <div className="max-w-[1200px] mx-auto px-4 py-4 text-center">
             <p className="text-xs text-white/50 leading-relaxed">
-              {s.site_copyright || `${s.site_short_name} 版权所有`} &copy; {new Date().getFullYear()}
-              {s.site_hotline && <>&nbsp;|&nbsp; 客服热线：{s.site_hotline}</>}
+              {s.site_copyright || `${s.site_short_name} ${t('版权所有')}`} &copy; {new Date().getFullYear()}
+              {s.site_hotline && <>&nbsp;|&nbsp; {t('客服热线：')}{s.site_hotline}</>}
             </p>
             {s.site_icp && (
               <p className="text-[10px] text-white/30 mt-1">
-                {s.site_icp} &nbsp;|&nbsp; 本网站支持IPv6
+                {s.site_icp} &nbsp;|&nbsp; {t('本网站支持IPv6')}
               </p>
             )}
           </div>

@@ -4,8 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { UserPlus, Shield, CheckCircle } from 'lucide-react'
 import { useSiteSettings } from '@/lib/useSiteSettings'
+import { useLanguage } from '@/components/LanguageProvider'
 
 export default function RegisterPage() {
+  const { t } = useLanguage()
   const s = useSiteSettings()
   const [form, setForm] = useState({
     username: '',
@@ -23,7 +25,7 @@ export default function RegisterPage() {
     setError('')
 
     if (form.password !== form.confirmPassword) {
-      setError('两次输入的密码不一致')
+      setError(t('两次输入的密码不一致'))
       return
     }
 
@@ -45,7 +47,7 @@ export default function RegisterPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || '注册失败')
+        setError(data.error || t('注册失败'))
         return
       }
 
@@ -53,7 +55,7 @@ export default function RegisterPage() {
       localStorage.setItem('user', JSON.stringify(data.user))
       window.location.href = '/'
     } catch {
-      setError('网络错误，请稍后重试')
+      setError(t('网络错误，请稍后重试'))
     } finally {
       setLoading(false)
     }
@@ -72,13 +74,13 @@ export default function RegisterPage() {
               <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center mb-6 backdrop-blur-sm">
                 <Shield size={28} className="text-white" />
               </div>
-              <h2 className="text-2xl font-bold mb-3">加入<br/>{s.site_short_name || '企业门户'}</h2>
-              <p className="text-sm text-red-200 leading-relaxed mb-8">注册后即可评论、互动和提交反馈</p>
+              <h2 className="text-2xl font-bold mb-3">{t('加入')}<br/>{s.site_short_name || t('企业门户')}</h2>
+              <p className="text-sm text-red-200 leading-relaxed mb-8">{t('注册后即可评论、互动和提交反馈')}</p>
               <div className="space-y-3">
                 {['参与评论互动', '上传图片和附件', '收藏支持反对', '提交反馈建议'].map((text, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <CheckCircle size={14} className="text-red-200 flex-shrink-0" />
-                    <span className="text-sm text-red-100">{text}</span>
+                    <span className="text-sm text-red-100">{t(text)}</span>
                   </div>
                 ))}
               </div>
@@ -88,8 +90,8 @@ export default function RegisterPage() {
           {/* Right Form Panel */}
           <div className="md:col-span-3 p-8 md:p-10">
             <div className="mb-6">
-              <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">新用户注册</h1>
-              <p className="text-xs text-gray-400 mt-1">填写以下信息创建您的账号</p>
+              <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t('新用户注册')}</h1>
+              <p className="text-xs text-gray-400 mt-1">{t('填写以下信息创建您的账号')}</p>
             </div>
 
             {error && (
@@ -99,58 +101,58 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">用户名 <span className="text-red-500">*</span></label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{t('用户名')} <span className="text-red-500">*</span></label>
                   <input type="text" value={form.username} onChange={e => setForm({ ...form, username: e.target.value })}
-                    className={inputCls} placeholder="3-20个字符" required minLength={3} maxLength={20} />
+                    className={inputCls} placeholder={t('3-20个字符')} required minLength={3} maxLength={20} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">真实姓名</label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{t('真实姓名')}</label>
                   <input type="text" value={form.realName} onChange={e => setForm({ ...form, realName: e.target.value })}
-                    className={inputCls} placeholder="选填" />
+                    className={inputCls} placeholder={t('选填')} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">密码 <span className="text-red-500">*</span></label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{t('密码')} <span className="text-red-500">*</span></label>
                   <input type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
-                    className={inputCls} placeholder="至少6个字符" required minLength={6} />
+                    className={inputCls} placeholder={t('至少6个字符')} required minLength={6} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">确认密码 <span className="text-red-500">*</span></label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{t('确认密码')} <span className="text-red-500">*</span></label>
                   <input type="password" value={form.confirmPassword} onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
-                    className={inputCls} placeholder="再次输入密码" required />
+                    className={inputCls} placeholder={t('再次输入密码')} required />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">邮箱</label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{t('邮箱')}</label>
                   <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-                    className={inputCls} placeholder="选填" />
+                    className={inputCls} placeholder={t('选填')} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">手机号</label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{t('手机号')}</label>
                   <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
-                    className={inputCls} placeholder="选填" />
+                    className={inputCls} placeholder={t('选填')} />
                 </div>
               </div>
 
               <button type="submit" disabled={loading}
                 className="w-full bg-bank-red hover:bg-bank-redDark text-white py-2.5 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2">
                 <UserPlus size={16} />
-                {loading ? '注册中...' : '立即注册'}
+                {loading ? t('注册中...') : t('立即注册')}
               </button>
             </form>
 
             <div className="flex items-center gap-3 mt-5">
               <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
-              <span className="text-[10px] text-gray-400">已有账号？</span>
+              <span className="text-[10px] text-gray-400">{t('已有账号？')}</span>
               <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
             </div>
 
             <p className="text-center text-xs text-gray-500 mt-3">
-              <Link href="/login" className="text-bank-red hover:underline font-medium">返回登录</Link>
+              <Link href="/login" className="text-bank-red hover:underline font-medium">{t('返回登录')}</Link>
             </p>
           </div>
         </div>

@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Search, Clock, Eye, User, TrendingUp, ArrowRight, Home, Tag } from 'lucide-react'
+import { useLanguage } from '@/components/LanguageProvider'
+import { formatLocaleDate } from '@/lib/i18n'
 
 interface Post {
   id: number
@@ -26,14 +28,16 @@ const fallbackGradients = [
 ]
 
 export default function SearchPage() {
+  const { t } = useLanguage()
   return (
-    <Suspense fallback={<div className="max-w-[1200px] mx-auto px-4 py-12 text-center text-gray-400 text-sm">加载中...</div>}>
+    <Suspense fallback={<div className="max-w-[1200px] mx-auto px-4 py-12 text-center text-gray-400 text-sm">{t('加载中...')}</div>}>
       <SearchPageContent />
     </Suspense>
   )
 }
 
 function SearchPageContent() {
+  const { language, t } = useLanguage()
   const searchParams = useSearchParams()
   const urlQuery = searchParams.get('q') || ''
 
@@ -81,22 +85,22 @@ function SearchPageContent() {
     doSearch(term)
   }
 
-  const fmtDate = (d: string) => new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  const fmtDate = (d: string) => formatLocaleDate(d, language, { year: 'numeric', month: '2-digit', day: '2-digit' })
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-5">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
-        <Link href="/" className="hover:text-bank-red flex items-center gap-1"><Home size={11} />首页</Link>
+        <Link href="/" className="hover:text-bank-red flex items-center gap-1"><Home size={11} />{t('首页')}</Link>
         <span>&gt;</span>
-        <span className="text-gray-700 dark:text-gray-300">信息查询</span>
+        <span className="text-gray-700 dark:text-gray-300">{t('信息查询')}</span>
       </div>
 
       {/* Search Hero */}
       <div className="card mb-5 overflow-hidden">
         <div className="bg-bank-primary p-6 md:p-8">
-          <h1 className="text-2xl font-bold text-white mb-1">信息查询</h1>
-          <p className="text-white/60 text-sm mb-5">搜索门户所有公开文章、通知和新闻</p>
+          <h1 className="text-2xl font-bold text-white mb-1">{t('信息查询')}</h1>
+          <p className="text-white/60 text-sm mb-5">{language === 'en' ? 'Search all public posts, notices and news in the portal' : '搜索门户所有公开文章、通知和新闻'}</p>
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
               <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -105,16 +109,16 @@ function SearchPageContent() {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border-0 rounded-lg text-sm focus:ring-2 focus:ring-white/50 outline-none bg-white dark:bg-gray-700 dark:text-gray-200 shadow-lg"
-                placeholder="输入关键词搜索文章..."
+                placeholder={t('输入关键词搜索文章...')}
               />
             </div>
             <button type="submit" className="bg-bank-red hover:bg-bank-redDark text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors shadow-lg" disabled={loading}>
-              {loading ? '搜索中...' : '搜索'}
+              {loading ? t('搜索中...') : t('搜索')}
             </button>
           </form>
           {/* Hot topics */}
           <div className="flex flex-wrap items-center gap-2 mt-4">
-            <span className="text-white/50 text-xs flex items-center gap-1"><TrendingUp size={11} />热搜：</span>
+            <span className="text-white/50 text-xs flex items-center gap-1"><TrendingUp size={11} />{t('热搜：')}</span>
             {categories.map(cat => (
               <button key={cat.slug} onClick={() => handleQuickSearch(cat.name)}
                 className="text-[11px] text-white/70 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full transition-colors">
@@ -131,9 +135,9 @@ function SearchPageContent() {
           {searched && (
             <div className="card">
               <div className="section-header">
-                <span className="text-sm font-bold">搜索结果</span>
+                <span className="text-sm font-bold">{t('搜索结果')}</span>
                 <span className="text-[10px] text-gray-300">
-                  {loading ? '搜索中...' : `找到 ${total} 条结果`}
+                  {loading ? t('搜索中...') : (language === 'en' ? `${total} results found` : `找到 ${total} 条结果`)}
                 </span>
               </div>
               {loading ? (
@@ -188,8 +192,8 @@ function SearchPageContent() {
                   <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Search size={24} className="text-gray-300 dark:text-gray-500" />
                   </div>
-                  <p className="text-gray-400 mb-1">未找到相关内容</p>
-                  <p className="text-xs text-gray-300 dark:text-gray-500">请尝试更换关键词或使用热搜词条</p>
+                  <p className="text-gray-400 mb-1">{t('未找到相关内容')}</p>
+                  <p className="text-xs text-gray-300 dark:text-gray-500">{t('请尝试更换关键词或使用热搜词条')}</p>
                 </div>
               )}
             </div>
@@ -201,8 +205,8 @@ function SearchPageContent() {
                 <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <Search size={32} className="text-gray-300 dark:text-gray-500" />
                 </div>
-                <p className="text-gray-500 dark:text-gray-400 mb-1">输入关键词开始搜索</p>
-                <p className="text-xs text-gray-300 dark:text-gray-500">支持搜索文章标题、内容和摘要</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-1">{t('输入关键词开始搜索')}</p>
+                <p className="text-xs text-gray-300 dark:text-gray-500">{t('支持搜索文章标题、内容和摘要')}</p>
               </div>
             </div>
           )}
@@ -213,7 +217,7 @@ function SearchPageContent() {
           {/* Category Shortcuts */}
           <div className="card">
             <div className="section-header-red">
-              <span className="text-sm font-bold">分类浏览</span>
+              <span className="text-sm font-bold">{t('分类浏览')}</span>
             </div>
             <div className="p-3 space-y-1">
               {categories.map((cat, i) => (
@@ -230,19 +234,19 @@ function SearchPageContent() {
 
           {/* Search Tips */}
           <div className="card p-4">
-            <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">搜索技巧</h3>
+            <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">{t('搜索技巧')}</h3>
             <ul className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
               <li className="flex items-start gap-2">
                 <span className="w-4 h-4 bg-bank-red/10 text-bank-red rounded flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">1</span>
-                使用精确关键词可以获得更准确的结果
+                {t('使用精确关键词可以获得更准确的结果')}
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-4 h-4 bg-bank-red/10 text-bank-red rounded flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">2</span>
-                可以搜索文章标题、正文或摘要内容
+                {t('可以搜索文章标题、正文或摘要内容')}
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-4 h-4 bg-bank-red/10 text-bank-red rounded flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">3</span>
-                使用热搜词条可快速浏览热门话题
+                {t('使用热搜词条可快速浏览热门话题')}
               </li>
             </ul>
           </div>

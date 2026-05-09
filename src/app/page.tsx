@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { ChevronRight, ChevronLeft } from 'lucide-react'
 import SafeHtml from '@/components/SafeHtml'
+import { useLanguage } from '@/components/LanguageProvider'
+import { formatLocaleDate, translateText } from '@/lib/i18n'
 
 interface Post {
   id: number
@@ -53,6 +55,7 @@ const defaultModules: HomeModule[] = [
 /* ========== Sub-components ========== */
 
 function BannerModule({ posts }: { posts: Post[] }) {
+  const { t } = useLanguage()
   const [idx, setIdx] = useState(0)
   useEffect(() => {
     if (posts.length <= 1) return
@@ -60,7 +63,7 @@ function BannerModule({ posts }: { posts: Post[] }) {
     return () => clearInterval(t)
   }, [posts])
   const cur = posts[idx]
-  if (!cur) return <div className="h-full flex items-center justify-center bg-gradient-to-br from-bank-primary to-bank-dark"><p className="text-white/50 text-sm">暂无置顶内容</p></div>
+  if (!cur) return <div className="h-full flex items-center justify-center bg-gradient-to-br from-bank-primary to-bank-dark"><p className="text-white/50 text-sm">{t('暂无置顶内容')}</p></div>
   return (
     <>
       <Link href={`/post/${cur.id}`} className="block h-full">
@@ -68,7 +71,7 @@ function BannerModule({ posts }: { posts: Post[] }) {
           : <div className="absolute inset-0" style={{ background: fallbackGradients[idx % fallbackGradients.length] }} />}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          <span className="inline-block text-[10px] bg-bank-red text-white px-2 py-0.5 rounded mb-2">{cur.category?.name || '推荐'}</span>
+          <span className="inline-block text-[10px] bg-bank-red text-white px-2 py-0.5 rounded mb-2">{cur.category?.name || t('推荐')}</span>
           <h3 className="text-white font-bold text-lg leading-tight mb-1.5">{cur.title}</h3>
           {cur.summary && <p className="text-gray-300 text-xs line-clamp-2 leading-relaxed">{cur.summary}</p>}
         </div>
@@ -83,10 +86,11 @@ function BannerModule({ posts }: { posts: Post[] }) {
 }
 
 function HeadlineModule({ posts, title }: { posts: Post[]; title: string }) {
+  const { t, language } = useLanguage()
   return (
     <div className="card h-full">
       <div className="section-header-red">
-        <span className="text-sm font-bold">{title}</span>
+        <span className="text-sm font-bold">{translateText(title, language)}</span>
       </div>
       {posts.length > 0 ? (
         <div className="p-4">
@@ -95,19 +99,20 @@ function HeadlineModule({ posts, title }: { posts: Post[]; title: string }) {
             {posts[0].summary && <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{posts[0].summary}</p>}
           </Link>
         </div>
-      ) : <div className="p-4 text-center text-gray-400 text-xs">暂无内容</div>}
+      ) : <div className="p-4 text-center text-gray-400 text-xs">{t('暂无内容')}</div>}
     </div>
   )
 }
 
 function ImageGridModule({ posts, title, wide }: { posts: Post[]; title: string; wide?: boolean }) {
+  const { language } = useLanguage()
   const count = wide ? 8 : 4
   const items = posts.filter(p => p.coverImage).slice(0, count)
     .concat(posts.filter(p => !p.coverImage).slice(0, Math.max(0, count - posts.filter(p => p.coverImage).length)))
     .slice(0, count)
   return (
     <div className="card h-full flex flex-col">
-      <div className="section-header"><span className="text-sm font-bold">{title}</span></div>
+      <div className="section-header"><span className="text-sm font-bold">{translateText(title, language)}</span></div>
       <div className="p-2.5 flex-1">
         <div className={`grid ${wide ? 'grid-cols-4' : 'grid-cols-2'} gap-2.5`}>
           {items.map((post, idx) => (
@@ -127,6 +132,7 @@ function ImageGridModule({ posts, title, wide }: { posts: Post[]; title: string;
 }
 
 function CategoryListModule({ mod, catPosts, cats, fmtShort }: { mod: HomeModule; catPosts: Record<string, Post[]>; cats: HomeCat[]; fmtShort: (d: string) => string }) {
+  const { t, language } = useLanguage()
   const tabWith = (mod.config?.tabWith as string) || ''
   const slugs = [mod.category || '', tabWith].filter(Boolean)
   const [active, setActive] = useState(slugs[0] || '')
@@ -137,7 +143,7 @@ function CategoryListModule({ mod, catPosts, cats, fmtShort }: { mod: HomeModule
   const display = posts.slice(0, limit)
 
   const renderList = () => {
-    if (display.length === 0) return <p className="text-gray-400 text-center py-6 text-xs">暂无内容</p>
+    if (display.length === 0) return <p className="text-gray-400 text-center py-6 text-xs">{t('暂无内容')}</p>
 
     if (layout === 'card') {
       return (
@@ -229,17 +235,17 @@ function CategoryListModule({ mod, catPosts, cats, fmtShort }: { mod: HomeModule
               </span>
             ))}
           </div>
-          <Link href={`/category/${active}`} className="text-[10px] text-gray-300 hover:text-white flex items-center gap-0.5">更多<ChevronRight size={10} /></Link>
+          <Link href={`/category/${active}`} className="text-[10px] text-gray-300 hover:text-white flex items-center gap-0.5">{t('更多')}<ChevronRight size={10} /></Link>
         </div>
       ) : (
         <div className="section-header">
-          <span className="text-sm font-bold">{mod.title || '分类文章'}</span>
+          <span className="text-sm font-bold">{translateText(mod.title || '分类文章', language)}</span>
         </div>
       )}
       <div className="p-3 flex-1">
         {slugs.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-xs text-gray-400">请在管理后台编辑此模块，选择要展示的分类</p>
+            <p className="text-xs text-gray-400">{t('请在管理后台编辑此模块，选择要展示的分类')}</p>
           </div>
         ) : renderList()}
       </div>
@@ -248,8 +254,9 @@ function CategoryListModule({ mod, catPosts, cats, fmtShort }: { mod: HomeModule
 }
 
 function NewsFeedModule({ posts, title, layout, fmtShort, wide }: { posts: Post[]; title: string; layout: string; fmtShort: (d: string) => string; wide?: boolean }) {
+  const { t, language } = useLanguage()
   const renderContent = () => {
-    if (posts.length === 0) return <p className="text-gray-400 text-center py-4 text-xs">暂无内容</p>
+    if (posts.length === 0) return <p className="text-gray-400 text-center py-4 text-xs">{t('暂无内容')}</p>
 
     if (layout === 'card') {
       return (
@@ -330,15 +337,16 @@ function NewsFeedModule({ posts, title, layout, fmtShort, wide }: { posts: Post[
 
   return (
     <div className="card">
-      <div className="section-header-red"><span className="text-sm font-bold">{title}</span></div>
+      <div className="section-header-red"><span className="text-sm font-bold">{translateText(title, language)}</span></div>
       <div className="p-3">{renderContent()}</div>
     </div>
   )
 }
 
 function LatestCoversModule({ posts, title, layout, fmtDate, fmtShort, wide }: { posts: Post[]; title: string; layout: string; fmtDate: (d: string) => string; fmtShort: (d: string) => string; wide?: boolean }) {
+  const { t, language } = useLanguage()
   const renderContent = () => {
-    if (posts.length === 0) return <p className="text-gray-400 text-center py-4 text-xs">暂无内容</p>
+    if (posts.length === 0) return <p className="text-gray-400 text-center py-4 text-xs">{t('暂无内容')}</p>
 
     if (layout === 'card') {
       return (
@@ -411,13 +419,14 @@ function LatestCoversModule({ posts, title, layout, fmtDate, fmtShort, wide }: {
 
   return (
     <div className="card">
-      <div className="section-header"><span className="text-sm font-bold">{title}</span></div>
+      <div className="section-header"><span className="text-sm font-bold">{translateText(title, language)}</span></div>
       <div className="p-3">{renderContent()}</div>
     </div>
   )
 }
 
 function QuickLinksModule({ cats }: { cats: HomeCat[] }) {
+  const { t } = useLanguage()
   const gradients = ['from-red-600 to-red-800', 'from-amber-500 to-orange-600', 'from-blue-800 to-blue-950', 'from-blue-500 to-blue-700', 'from-emerald-500 to-emerald-700', 'from-violet-500 to-violet-700']
   const items = cats.map((c, i) => ({
     href: `/category/${c.slug}`,
@@ -425,7 +434,7 @@ function QuickLinksModule({ cats }: { cats: HomeCat[] }) {
     desc: c.description || '',
     gradient: gradients[i % gradients.length],
   }))
-  items.push({ href: '/search', label: '信息查询', desc: '搜索文章资讯', gradient: 'from-emerald-500 to-emerald-700' })
+  items.push({ href: '/search', label: t('信息查询'), desc: t('搜索文章资讯'), gradient: 'from-emerald-500 to-emerald-700' })
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
       {items.slice(0, 6).map((item, qi) => (
@@ -448,14 +457,15 @@ function QuickLinksModule({ cats }: { cats: HomeCat[] }) {
 /* ========== Main page ========== */
 
 export default function HomePage() {
+  const { language } = useLanguage()
   const [cats, setCats] = useState<HomeCat[]>([])
   const [modules, setModules] = useState<HomeModule[]>([])
   const [catPosts, setCatPosts] = useState<Record<string, Post[]>>({})
   const [topPosts, setTopPosts] = useState<Post[]>([])
   const [allPosts, setAllPosts] = useState<Post[]>([])
 
-  const fmtDate = useCallback((d: string) => new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }), [])
-  const fmtShort = useCallback((d: string) => new Date(d).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }), [])
+  const fmtDate = useCallback((d: string) => formatLocaleDate(d, language, { year: 'numeric', month: '2-digit', day: '2-digit' }), [language])
+  const fmtShort = useCallback((d: string) => formatLocaleDate(d, language, { month: '2-digit', day: '2-digit' }), [language])
 
   useEffect(() => {
     Promise.all([
@@ -523,27 +533,27 @@ export default function HomePage() {
       case 'banner':
         return <div key={mod.id} id={anchor} className={`${widthClass(mod.width)} card relative overflow-hidden`} style={{ minHeight: 320 }}><BannerModule posts={topPosts} /></div>
       case 'top_headline':
-        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><HeadlineModule posts={topPosts} title={mod.title} /></div>
+        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><HeadlineModule posts={topPosts} title={translateText(mod.title, language)} /></div>
       case 'image_grid':
-        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><ImageGridModule posts={allPosts} title={mod.title} wide={mod.width === 'full' || mod.width === 'two-thirds'} /></div>
+        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><ImageGridModule posts={allPosts} title={translateText(mod.title, language)} wide={mod.width === 'full' || mod.width === 'two-thirds'} /></div>
       case 'quick_links':
         return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><QuickLinksModule cats={cats} /></div>
       case 'category_list':
         return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><CategoryListModule mod={mod} catPosts={catPosts} cats={cats} fmtShort={fmtShort} /></div>
       case 'news_feed':
-        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><NewsFeedModule posts={allPosts.slice(0, (mod.config?.limit as number) || 8)} title={mod.title} layout={(mod.config?.layout as string) || 'default'} fmtShort={fmtShort} wide={mod.width === 'full' || mod.width === 'two-thirds'} /></div>
+        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><NewsFeedModule posts={allPosts.slice(0, (mod.config?.limit as number) || 8)} title={translateText(mod.title, language)} layout={(mod.config?.layout as string) || 'default'} fmtShort={fmtShort} wide={mod.width === 'full' || mod.width === 'two-thirds'} /></div>
       case 'latest_covers':
-        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><LatestCoversModule posts={allPosts.slice(0, (mod.config?.limit as number) || 5)} title={mod.title} layout={(mod.config?.layout as string) || 'default'} fmtDate={fmtDate} fmtShort={fmtShort} wide={mod.width === 'full' || mod.width === 'two-thirds'} /></div>
+        return <div key={mod.id} id={anchor} className={widthClass(mod.width)}><LatestCoversModule posts={allPosts.slice(0, (mod.config?.limit as number) || 5)} title={translateText(mod.title, language)} layout={(mod.config?.layout as string) || 'default'} fmtDate={fmtDate} fmtShort={fmtShort} wide={mod.width === 'full' || mod.width === 'two-thirds'} /></div>
       case 'custom':
         return (
           <div key={mod.id} id={anchor} className={widthClass(mod.width)}>
             <div className="card overflow-hidden" style={{ backgroundColor: (mod.config?.bgColor as string) || undefined }}>
               {(mod.title || mod.config?.linkUrl) && (
                 <div className="flex items-center justify-between px-4 pt-3 pb-2">
-                  {mod.title && <h3 className="font-bold text-base text-bank-dark dark:text-gray-100">{mod.title}</h3>}
+                  {mod.title && <h3 className="font-bold text-base text-bank-dark dark:text-gray-100">{translateText(mod.title, language)}</h3>}
                   {mod.config?.linkUrl && (
                     <Link href={mod.config.linkUrl as string} className="text-xs text-gray-400 hover:text-bank-red flex items-center gap-0.5">
-                      {(mod.config?.linkText as string) || '查看更多'}<ChevronRight size={12} />
+                      {translateText((mod.config?.linkText as string) || '查看更多', language)}<ChevronRight size={12} />
                     </Link>
                   )}
                 </div>

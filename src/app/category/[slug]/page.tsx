@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Clock, Eye, ChevronLeft, ChevronRight, ArrowLeft, User, Layers, FolderOpen, Bell, Newspaper, Home, ExternalLink } from 'lucide-react'
+import { useLanguage } from '@/components/LanguageProvider'
+import { formatLocaleDate } from '@/lib/i18n'
 
 interface Post {
   id: number
@@ -40,6 +42,7 @@ const fallbackGradients = [
 ]
 
 export default function CategoryPage({ params }: { params: { slug: string } }) {
+  const { language, t } = useLanguage()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -80,13 +83,13 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
     }
   }
 
-  const fmtDate = (d: string) => new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  const fmtDate = (d: string) => formatLocaleDate(d, language, { year: 'numeric', month: '2-digit', day: '2-digit' })
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-5">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
-        <Link href="/" className="hover:text-bank-red flex items-center gap-1"><Home size={11} />首页</Link>
+        <Link href="/" className="hover:text-bank-red flex items-center gap-1"><Home size={11} />{t('首页')}</Link>
         <span>&gt;</span>
         <span className="text-gray-700 dark:text-gray-300">{meta.name}</span>
       </div>
@@ -104,9 +107,9 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
             </div>
           </div>
           <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/10">
-            <span className="text-white/60 text-xs">共 {total} 篇文章</span>
+            <span className="text-white/60 text-xs">{language === 'en' ? `${total} posts in total` : `共 ${total} 篇文章`}</span>
             <span className="text-white/40">·</span>
-            <span className="text-white/60 text-xs">第 {page}/{totalPages} 页</span>
+            <span className="text-white/60 text-xs">{language === 'en' ? `Page ${page} of ${totalPages}` : `第 ${page}/${totalPages} 页`}</span>
           </div>
         </div>
       </div>
@@ -116,8 +119,8 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         <div className="lg:col-span-8">
           <div className="card">
             <div className="section-header">
-              <span className="text-sm font-bold">文章列表</span>
-              <span className="text-[10px] text-gray-300">{total} 篇</span>
+              <span className="text-sm font-bold">{t('文章列表')}</span>
+              <span className="text-[10px] text-gray-300">{language === 'en' ? `${total} posts` : `${total} 篇`}</span>
             </div>
             {loading ? (
               <div className="p-6 space-y-5">
@@ -151,7 +154,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          {post.isTop && <span className="text-[9px] bg-bank-red text-white px-1.5 py-0.5 rounded">置顶</span>}
+                          {post.isTop && <span className="text-[9px] bg-bank-red text-white px-1.5 py-0.5 rounded">{t('置顶')}</span>}
                           <h3 className="text-base font-medium text-gray-800 dark:text-gray-100 group-hover:text-bank-red transition-colors line-clamp-1">
                             {post.title}
                           </h3>
@@ -174,7 +177,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
                 <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <Newspaper size={24} className="text-gray-300 dark:text-gray-500" />
                 </div>
-                <p className="text-gray-400">该分类下暂无内容</p>
+                <p className="text-gray-400">{t('该分类下暂无内容')}</p>
               </div>
             )}
 
@@ -182,7 +185,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-1 p-4 border-t dark:border-gray-700">
                 <button onClick={() => setPage(1)} disabled={page === 1}
-                  className="px-3 py-1.5 rounded-lg border dark:border-gray-600 text-xs disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">首页</button>
+                  className="px-3 py-1.5 rounded-lg border dark:border-gray-600 text-xs disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">{t('首页')}</button>
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
                   className="px-3 py-1.5 rounded-lg border dark:border-gray-600 text-sm disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                   <ChevronLeft size={14} />
@@ -203,7 +206,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
                   <ChevronRight size={14} />
                 </button>
                 <button onClick={() => setPage(totalPages)} disabled={page === totalPages}
-                  className="px-3 py-1.5 rounded-lg border dark:border-gray-600 text-xs disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">末页</button>
+                  className="px-3 py-1.5 rounded-lg border dark:border-gray-600 text-xs disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">{language === 'en' ? 'Last' : '末页'}</button>
               </div>
             )}
           </div>
@@ -214,7 +217,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
           {/* Category Navigation */}
           <div className="card">
             <div className="section-header-red">
-              <span className="text-sm font-bold">栏目导航</span>
+              <span className="text-sm font-bold">{t('栏目导航')}</span>
             </div>
             <div className="p-3 space-y-1">
               {categories.map(cat => (
@@ -230,7 +233,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
           {/* Quick Links - dynamically from categories */}
           <div className="card">
             <div className="section-header">
-              <span className="text-sm font-bold">快捷服务</span>
+              <span className="text-sm font-bold">{t('快捷服务')}</span>
             </div>
             <div className="p-3 space-y-1.5">
               {categories.filter(c => c.slug !== decodedSlug).slice(0, 4).map(c => (
@@ -240,7 +243,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
                 </Link>
               ))}
               <Link href="/post/create" className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 transition-colors">
-                <Newspaper size={14} />发布文章
+                <Newspaper size={14} />{t('发布文章')}
               </Link>
             </div>
           </div>
@@ -248,7 +251,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
           {/* Tips */}
           <div className="card p-4">
             <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
-              <strong className="text-gray-600 dark:text-gray-400">温馨提示：</strong>可通过导航栏快速切换各栏目，或使用页面两侧悬浮按钮进入对应功能。
+              <strong className="text-gray-600 dark:text-gray-400">{t('温馨提示：')}</strong>{t('可通过导航栏快速切换各栏目，或使用页面两侧悬浮按钮进入对应功能。')}
             </p>
           </div>
         </div>
